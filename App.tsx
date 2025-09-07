@@ -10,6 +10,7 @@ const App: React.FC = () => {
   const [view, setView] = useState<View>('tasks');
   const [isLoading, setIsLoading] = useState<string | null>(null);
   const [isAdSdkReady, setIsAdSdkReady] = useState(false);
+  const [adSdkError, setAdSdkError] = useState(false);
   const [theme, setTheme] = useState({
     bg: '#18222d',
     textColor: '#ffffff',
@@ -53,8 +54,8 @@ const App: React.FC = () => {
         elapsedTime += pollInterval;
         if (elapsedTime >= maxWaitTime) {
           console.error("Ad SDK failed to load within the time limit.");
+          setAdSdkError(true);
           clearInterval(intervalId);
-          // Optionally, set an error state here to inform the user
         }
       }
     }, pollInterval);
@@ -63,7 +64,7 @@ const App: React.FC = () => {
   }, []);
 
   const handleAd = useCallback(async <T,>(taskName: string, adFunction: () => T | Promise<T>, successMessage: string) => {
-    if (isLoading || !isAdSdkReady) return;
+    if (isLoading || !isAdSdkReady || adSdkError) return;
     
     if (typeof (window as any).show_9825300 !== 'function') {
       console.error('Ad function show_9825300 is not available on window object.');
@@ -91,7 +92,7 @@ const App: React.FC = () => {
     } finally {
       setIsLoading(null);
     }
-  }, [isLoading, webApp, isAdSdkReady]);
+  }, [isLoading, webApp, isAdSdkReady, adSdkError]);
 
 
   const showInterstitialAd = useCallback(() => {
@@ -100,22 +101,13 @@ const App: React.FC = () => {
   }, [handleAd]);
   
   const showPopupAd = useCallback(() => {
-    const adFunc = () => (window as any).show_9825300('pop');
+    const adFunc = () => (window as any).show_9825300();
     handleAd('Popup', adFunc, 'Rewarded Popup ad viewed successfully! Your reward has been processed.');
   }, [handleAd]);
   
   const showInAppAd = useCallback(() => {
-    const adFunc = () => (window as any).show_9825300({
-      type: 'inApp',
-      inAppSettings: {
-        frequency: 2,
-        capping: 0.1,
-        interval: 30,
-        timeout: 5,
-        everyPage: false
-      }
-    });
-    handleAd('In-App', adFunc, 'In-App ad session started. Ads will appear based on the configured rules.');
+    const adFunc = () => (window as any).show_9825300();
+    handleAd('In-App', adFunc, 'In-App ad viewed successfully! Your reward has been processed.');
   }, [handleAd]);
 
   return (
@@ -134,6 +126,7 @@ const App: React.FC = () => {
               onWatch={showInterstitialAd}
               isLoading={isLoading === 'Interstitial'}
               isAdSdkReady={isAdSdkReady}
+              adSdkError={adSdkError}
               IconComponent={InterstitialIcon}
               theme={theme}
             />
@@ -143,6 +136,7 @@ const App: React.FC = () => {
               onWatch={showPopupAd}
               isLoading={isLoading === 'Popup'}
               isAdSdkReady={isAdSdkReady}
+              adSdkError={adSdkError}
               IconComponent={PopupIcon}
               theme={theme}
             />
@@ -152,6 +146,7 @@ const App: React.FC = () => {
               onWatch={showInAppAd}
               isLoading={isLoading === 'In-App'}
               isAdSdkReady={isAdSdkReady}
+              adSdkError={adSdkError}
               IconComponent={InAppIcon}
               theme={theme}
             />

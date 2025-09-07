@@ -6,6 +6,7 @@ interface TaskCardProps {
   onWatch: () => void;
   isLoading: boolean;
   isAdSdkReady: boolean;
+  adSdkError: boolean;
   IconComponent: React.FC<{ className?: string }>;
   theme: {
     buttonColor: string;
@@ -14,7 +15,7 @@ interface TaskCardProps {
   };
 }
 
-const TaskCard: React.FC<TaskCardProps> = ({ title, description, onWatch, isLoading, isAdSdkReady, IconComponent, theme }) => {
+const TaskCard: React.FC<TaskCardProps> = ({ title, description, onWatch, isLoading, isAdSdkReady, adSdkError, IconComponent, theme }) => {
   return (
     <div className="bg-white/5 backdrop-blur-md p-5 rounded-xl border border-white/10 shadow-lg">
       <div className="flex items-center space-x-4">
@@ -29,7 +30,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ title, description, onWatch, isLoad
       </div>
       <button
         onClick={onWatch}
-        disabled={isLoading || !isAdSdkReady}
+        disabled={isLoading || !isAdSdkReady || adSdkError}
         className="w-full mt-4 py-2.5 px-5 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-blue-500/50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
         style={{ backgroundColor: theme.buttonColor, color: theme.buttonTextColor }}
       >
@@ -41,6 +42,8 @@ const TaskCard: React.FC<TaskCardProps> = ({ title, description, onWatch, isLoad
             </svg>
             Processing...
           </>
+        ) : adSdkError ? (
+          'Ads Unavailable'
         ) : !isAdSdkReady ? (
           'Loading Ads...'
         ) : (
