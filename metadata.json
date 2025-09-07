@@ -1,0 +1,5 @@
+{
+  "name": "Daily Earn",
+  "description": "A Telegram Web App where users can watch advertisements to earn rewards. It features different ad formats and a user profile section.",
+  "requestFramePermissions": []
+}
