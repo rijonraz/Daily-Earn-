@@ -37,7 +37,7 @@ const App: React.FC = () => {
   
   // Effect to check for the ad SDK readiness
   useEffect(() => {
-    if (typeof (window as any).show_9825300 === 'function') {
+    if (typeof (window as any).show_9838335 === 'function') {
       setIsAdSdkReady(true);
       return;
     }
@@ -47,7 +47,7 @@ const App: React.FC = () => {
     let elapsedTime = 0;
 
     const intervalId = setInterval(() => {
-      if (typeof (window as any).show_9825300 === 'function') {
+      if (typeof (window as any).show_9838335 === 'function') {
         setIsAdSdkReady(true);
         clearInterval(intervalId);
       } else {
@@ -66,8 +66,8 @@ const App: React.FC = () => {
   const handleAd = useCallback(async <T,>(taskName: string, adFunction: () => T | Promise<T>, successMessage: string) => {
     if (isLoading || !isAdSdkReady || adSdkError) return;
     
-    if (typeof (window as any).show_9825300 !== 'function') {
-      console.error('Ad function show_9825300 is not available on window object.');
+    if (typeof (window as any).show_9838335 !== 'function') {
+      console.error('Ad function show_9838335 is not available on window object.');
       alert('Ad service is currently unavailable. Please check your connection or try again later.');
       if (webApp) {
         webApp.HapticFeedback.notificationOccurred('error');
@@ -96,18 +96,27 @@ const App: React.FC = () => {
 
 
   const showInterstitialAd = useCallback(() => {
-    const adFunc = () => (window as any).show_9825300();
+    const adFunc = () => (window as any).show_9838335();
     handleAd('Interstitial', adFunc, 'Rewarded Interstitial ad viewed successfully! Your reward has been processed.');
   }, [handleAd]);
   
   const showPopupAd = useCallback(() => {
-    const adFunc = () => (window as any).show_9825300();
+    const adFunc = () => (window as any).show_9838335('pop');
     handleAd('Popup', adFunc, 'Rewarded Popup ad viewed successfully! Your reward has been processed.');
   }, [handleAd]);
   
   const showInAppAd = useCallback(() => {
-    const adFunc = () => (window as any).show_9825300();
-    handleAd('In-App', adFunc, 'In-App ad viewed successfully! Your reward has been processed.');
+    const adFunc = () => (window as any).show_9838335({
+      type: 'inApp',
+      inAppSettings: {
+        frequency: 2,
+        capping: 0.1,
+        interval: 30,
+        timeout: 5,
+        everyPage: false
+      }
+    });
+    handleAd('In-App', adFunc, 'In-App ad session started! Ads will appear as you browse.');
   }, [handleAd]);
 
   return (
