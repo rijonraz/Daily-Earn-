@@ -82,7 +82,6 @@ const App: React.FC = () => {
       if (webApp) {
         webApp.HapticFeedback.notificationOccurred('success');
       }
-      alert('You have been rewarded for watching the ad!');
     } catch (e) {
       console.error('Error showing Interstitial ad:', e);
       if (webApp) {
@@ -113,7 +112,6 @@ const App: React.FC = () => {
       if (webApp) {
         webApp.HapticFeedback.notificationOccurred('success');
       }
-      alert('You have been rewarded for viewing the ad!');
     } catch (e) {
       console.error('Error showing Popup ad:', e);
       if (webApp) {
@@ -152,7 +150,6 @@ const App: React.FC = () => {
        if (webApp) {
         webApp.HapticFeedback.notificationOccurred('success');
       }
-      alert('In-App ad session started! Ads will now appear as you browse.');
     } catch (e) {
       console.error('Error starting In-App ad session:', e);
       if (webApp) {
