@@ -63,7 +63,7 @@ const App: React.FC = () => {
     return () => clearInterval(intervalId);
   }, []);
 
-  const handleAd = useCallback(async <T,>(taskName: string, adFunction: () => T | Promise<T>, successMessage: string) => {
+  const handleAd = useCallback(async <T,>(taskName: string, adFunction: () => T | Promise<T>) => {
     if (isLoading || !isAdSdkReady || adSdkError) return;
     
     if (typeof (window as any).show_9838335 !== 'function') {
@@ -82,7 +82,6 @@ const App: React.FC = () => {
       if (webApp) {
         webApp.HapticFeedback.notificationOccurred('success');
       }
-      alert(successMessage);
     } catch (e) {
       console.error(`Error showing ${taskName} ad:`, e);
       if (webApp) {
@@ -97,12 +96,12 @@ const App: React.FC = () => {
 
   const showInterstitialAd = useCallback(() => {
     const adFunc = () => (window as any).show_9838335();
-    handleAd('Interstitial', adFunc, 'Rewarded Interstitial ad viewed successfully! Your reward has been processed.');
+    handleAd('Interstitial', adFunc);
   }, [handleAd]);
   
   const showPopupAd = useCallback(() => {
     const adFunc = () => (window as any).show_9838335('pop');
-    handleAd('Popup', adFunc, 'Rewarded Popup ad viewed successfully! Your reward has been processed.');
+    handleAd('Popup', adFunc);
   }, [handleAd]);
   
   const showInAppAd = useCallback(() => {
@@ -116,7 +115,7 @@ const App: React.FC = () => {
         everyPage: false
       }
     });
-    handleAd('In-App', adFunc, 'In-App ad session started! Ads will appear as you browse.');
+    handleAd('In-App', adFunc);
   }, [handleAd]);
 
   return (
