@@ -63,7 +63,7 @@ const App: React.FC = () => {
     return () => clearInterval(intervalId);
   }, []);
 
-  const handleAd = useCallback(async <T,>(taskName: string, adFunction: () => T | Promise<T>) => {
+  const showInterstitialAd = useCallback(async () => {
     if (isLoading || !isAdSdkReady || adSdkError) return;
     
     if (typeof (window as any).show_9838335 !== 'function') {
@@ -75,48 +75,94 @@ const App: React.FC = () => {
       return;
     }
 
-    setIsLoading(taskName);
-
+    setIsLoading('Interstitial');
     try {
-      await Promise.resolve(adFunction());
+      await (window as any).show_9838335();
+      // Reward logic as per SDK docs
       if (webApp) {
         webApp.HapticFeedback.notificationOccurred('success');
       }
+      alert('You have been rewarded for watching the ad!');
     } catch (e) {
-      console.error(`Error showing ${taskName} ad:`, e);
+      console.error('Error showing Interstitial ad:', e);
       if (webApp) {
         webApp.HapticFeedback.notificationOccurred('error');
       }
-      alert(`An error occurred while showing the ${taskName} ad. Please try again.`);
+      alert('An error occurred while showing the ad. Please try again.');
     } finally {
       setIsLoading(null);
     }
   }, [isLoading, webApp, isAdSdkReady, adSdkError]);
-
-
-  const showInterstitialAd = useCallback(() => {
-    const adFunc = () => (window as any).show_9838335();
-    handleAd('Interstitial', adFunc);
-  }, [handleAd]);
   
-  const showPopupAd = useCallback(() => {
-    const adFunc = () => (window as any).show_9838335('pop');
-    handleAd('Popup', adFunc);
-  }, [handleAd]);
-  
-  const showInAppAd = useCallback(() => {
-    const adFunc = () => (window as any).show_9838335({
-      type: 'inApp',
-      inAppSettings: {
-        frequency: 2,
-        capping: 0.1,
-        interval: 30,
-        timeout: 5,
-        everyPage: false
+  const showPopupAd = useCallback(async () => {
+    if (isLoading || !isAdSdkReady || adSdkError) return;
+    
+    if (typeof (window as any).show_9838335 !== 'function') {
+      console.error('Ad function show_9838335 is not available on window object.');
+      alert('Ad service is currently unavailable. Please check your connection or try again later.');
+      if (webApp) {
+        webApp.HapticFeedback.notificationOccurred('error');
       }
-    });
-    handleAd('In-App', adFunc);
-  }, [handleAd]);
+      return;
+    }
+
+    setIsLoading('Popup');
+    try {
+      await (window as any).show_9838335('pop');
+      // Reward logic as per SDK docs
+      if (webApp) {
+        webApp.HapticFeedback.notificationOccurred('success');
+      }
+      alert('You have been rewarded for viewing the ad!');
+    } catch (e) {
+      console.error('Error showing Popup ad:', e);
+      if (webApp) {
+        webApp.HapticFeedback.notificationOccurred('error');
+      }
+      alert('An error occurred while showing the ad. Please try again.');
+    } finally {
+      setIsLoading(null);
+    }
+  }, [isLoading, webApp, isAdSdkReady, adSdkError]);
+  
+  const showInAppAd = useCallback(async () => {
+    if (isLoading || !isAdSdkReady || adSdkError) return;
+    
+    if (typeof (window as any).show_9838335 !== 'function') {
+      console.error('Ad function show_9838335 is not available on window object.');
+      alert('Ad service is currently unavailable. Please check your connection or try again later.');
+      if (webApp) {
+        webApp.HapticFeedback.notificationOccurred('error');
+      }
+      return;
+    }
+
+    setIsLoading('In-App');
+    try {
+      await Promise.resolve((window as any).show_9838335({
+        type: 'inApp',
+        inAppSettings: {
+          frequency: 2,
+          capping: 0.1,
+          interval: 30,
+          timeout: 5,
+          everyPage: false
+        }
+      }));
+       if (webApp) {
+        webApp.HapticFeedback.notificationOccurred('success');
+      }
+      alert('In-App ad session started! Ads will now appear as you browse.');
+    } catch (e) {
+      console.error('Error starting In-App ad session:', e);
+      if (webApp) {
+        webApp.HapticFeedback.notificationOccurred('error');
+      }
+      alert('An error occurred while starting the ad session. Please try again.');
+    } finally {
+      setIsLoading(null);
+    }
+  }, [isLoading, webApp, isAdSdkReady, adSdkError]);
 
   return (
     <div className="flex flex-col h-screen overflow-hidden" style={{ backgroundColor: theme.bg, color: theme.textColor }}>
